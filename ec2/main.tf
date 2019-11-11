@@ -15,7 +15,7 @@ resource "aws_instance" "ec2" {
     user_data = <<-EOF
                 #!/bin/bash
                 echo "Hello World" > index.html
-                nohup busybox httpd -f -p 8080 &
+                nohup busybox httpd -f -p ${var.server_port} &
                 EOF 
   }
 resource "aws_security_group" "allow_web_traffic" {
@@ -23,8 +23,8 @@ resource "aws_security_group" "allow_web_traffic" {
   description = "Allow TLS inbound traffic"
   ingress {
     # TLS (change to whatever ports you need)
-    from_port = 8080
-    to_port   = 8080
+    from_port = var.server_port
+    to_port   = var.server_port
     protocol  = "tcp"
     # Please restrict your ingress to only necessary IPs and ports.
     # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
