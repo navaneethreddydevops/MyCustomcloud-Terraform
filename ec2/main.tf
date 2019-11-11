@@ -18,7 +18,7 @@ resource "aws_instance" "ec2" {
                 EOF 
 }
 resource "aws_security_group" "allow_web_traffic" {
-  name        = "allow_web_traffi"
+  name        = "allow_web_traffic"
   description = "Allow TLS inbound traffic"
   ingress {
     # TLS (change to whatever ports you need)
@@ -28,5 +28,23 @@ resource "aws_security_group" "allow_web_traffic" {
     # Please restrict your ingress to only necessary IPs and ports.
     # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
     cidr_blocks = ["0.0.0.0/0"]# add a CIDR block here
+  }
+  egress {
+    # TLS (change to whatever ports you need)
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    # Please restrict your ingress to only necessary IPs and ports.
+    # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
+    cidr_blocks = ["0.0.0.0/0"]# add a CIDR block here
+  }
+  ingress{
+    from_port   = 22
+    to_port     = 22
+    protocol    = "ssh"
+    # Please restrict your ingress to only necessary IPs and ports.
+    # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
+    cidr_blocks = ["0.0.0.0/0"]
+
   }
 }
