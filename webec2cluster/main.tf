@@ -4,14 +4,17 @@ provider "aws" {
   profile                 = "default"
 }
 resource "aws_launch_configuration" "launchtemplate" {
-  image_id            = "ami-00dc79254d0461090"
-  instance_type      = "r4.xlarge"
+  image_id        = "ami-00dc79254d0461090"
+  instance_type   = "r4.xlarge"
   security_groups = [aws_security_group.securitygroup.id]
-  user_data          = <<-EOF
+  user_data       = <<-EOF
                 #!/bin/bash
                 echo "Hello World" > index.html
                 nohup busybox httpd -f -p ${var.server_port} &
                 EOF
+  lifecycle {
+    create_before_destroy = true
+  }
 
 }
 resource "aws_security_group" "securitygroup" {
@@ -34,8 +37,18 @@ resource "aws_security_group" "securitygroup" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+data "aws_vpc" "default" {
+  default = true
+
+}
+data "aws_subnet_ids" "subnetids" {
+  vpc_id = data.aws_vpc.default.id
+
+}
+
 resource "aws_autoscaling_group" "autoscaling" {
   launch_configuration = aws_launch_configuration.launchtemplate.name
+  vpc_zone_identifier  = data.aws_subnet_ids.subnetids.ids
   min_size             = 2
   max_size             = 3
   tag {
