@@ -1,11 +1,12 @@
 provider "aws" {
-  region                  = "us-east-1"
-  shared_credentials_file = "/Users/navaneethreddy/.aws/credentials"
-  profile                 = "default"
+  region                  = var.region
+  shared_credentials_file = var.shared_credentials_file
+  profile                 = var.profile
 }
 resource "aws_launch_configuration" "launchtemplate" {
-  image_id        = "ami-00dc79254d0461090"
-  instance_type   = "r4.xlarge"
+  image_id        = var.image[var.region]
+  instance_type   = var.instance_type
+  key_name        = var.key_name
   security_groups = [aws_security_group.securitygroup.id]
   user_data       = <<-EOF
                 #!/bin/bash
@@ -28,6 +29,15 @@ resource "aws_security_group" "securitygroup" {
     # Please restrict your ingress to only necessary IPs and ports.
     # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
     cidr_blocks = ["172.31.0.0/16"] # add a CIDR block here
+  }
+  ingress {
+    # TLS (change to whatever ports you need)
+    from_port = var.ssh_port
+    to_port   = var.ssh_port
+    protocol  = "tcp"
+    # Please restrict your ingress to only necessary IPs and ports.
+    # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
+    cidr_blocks = ["173.172.34.56/32"] # add a CIDR block here
   }
 
   egress {
