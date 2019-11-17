@@ -12,6 +12,8 @@ resource "aws_launch_configuration" "launchtemplate" {
                 #!/bin/bash
                 echo "Hello World" > index.html
                 nohup busybox httpd -f -p ${var.server_port} &
+                sudo yum install -y git
+                sudo yum install -y ansible
                 EOF
   lifecycle {
     create_before_destroy = true
@@ -59,8 +61,8 @@ data "aws_subnet_ids" "subnetids" {
 resource "aws_autoscaling_group" "autoscaling" {
   launch_configuration = aws_launch_configuration.launchtemplate.name
   vpc_zone_identifier  = data.aws_subnet_ids.subnetids.ids
-  min_size             = 2
-  max_size             = 3
+  min_size             = var.min_size
+  max_size             = var.max_size
   tag {
     key                 = "Name"
     value               = "Terraform ASG"
