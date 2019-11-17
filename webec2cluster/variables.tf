@@ -13,7 +13,7 @@ variable "shared_credentials_file" {
 variable "server_port" {
   description = "The port the server will use for HTTP requests"
   type        = number
-  default     = 8080
+  default     = 80
 }
 variable "ssh_port" {
   description = "SSH port to login into server"
