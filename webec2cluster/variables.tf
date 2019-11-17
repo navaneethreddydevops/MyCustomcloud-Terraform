@@ -12,12 +12,12 @@ variable "shared_credentials_file" {
 }
 variable "server_port" {
   description = "The port the server will use for HTTP requests"
-  type        = number
+  type        = "string"
   default     = 80
 }
 variable "ssh_port" {
   description = "SSH port to login into server"
-  type        = number
+  type        = "string"
   default     = "22"
 }
 variable "image" {
@@ -37,15 +37,11 @@ variable "key_name" {
   default = "keypair"
 }
 variable "min_size" {
-  type    = number
-  default = "2"
-}
-variable "min_size" {
-  type    = number
+  type    = "string"
   default = "2"
 }
 variable "max_size" {
-  type    = number
+  type    = "string"
   default = "3"
 }
 
