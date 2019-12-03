@@ -46,7 +46,5 @@ resource "aws_security_group" "allow_web_traffic" {
     # Please restrict your ingress to only necessary IPs and ports.
     # Opening to 0.0.0.0/0 can lead to security vulnerabilities.
     cidr_blocks = ["10.0.1.0/24"]
-
   }
-  
 }
