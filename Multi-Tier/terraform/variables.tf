@@ -22,3 +22,7 @@ variable "PRIVATE_SUBNET_CIDR_2" {
   description = "Ingress Subnet AZ 1 CIDR"
   default     = "10.102.4.0/24"
 }
+variable "MY_HOME_CIDR" {
+  description = "Ingress Subnet AZ 1 CIDR"
+  default     = "173.172.34.56/32"
+}

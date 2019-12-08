@@ -55,3 +55,110 @@ resource "aws_subnet" "PRIVATE_SUBNET_2" {
     BusinessApplication = "PrivateSubnet2"
   }
 }
+
+#####Defining the Bastion Security Groups
+resource "aws_security_group" "bastion_sg" {
+  name        = "BASTION_SG"
+  description = "Allows all Inbound Traffic"
+  vpc_id      = "${aws_vpc.multitier_vpc.id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.MY_HOME_CIDR}"]
+  }
+  egress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_1}"]
+  }
+  egress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_2}"]
+  }
+  tags = {
+    Name                = "BASTION_SG"
+    Ownercontact        = "navaneethreddydevops@gmail.com"
+    BusinessApplication = "BASTION_SG"
+  }
+  depends_on = [
+    "aws_vpc.multitier_vpc"
+  ]
+}
+
+#####Defining the Application Loadbalancer Security Groups
+resource "aws_security_group" "application_loadbalancer_sg" {
+  name        = "application_loadbalancer_sg"
+  description = "Allows all Inbound Traffic"
+  vpc_id      = "${aws_vpc.multitier_vpc.id}"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_1}"]
+  }
+  egress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_2}"]
+  }
+  tags = {
+    Name                = "APPLICATION_LOAD_BALANCER"
+    Ownercontact        = "navaneethreddydevops@gmail.com"
+    BusinessApplication = "APPLICATION_LOAD_BALANCER"
+  }
+  depends_on = [
+    "aws_vpc.multitier_vpc"
+  ]
+}
+#####Defining the Application Security Groups
+resource "aws_security_group" "application_sg" {
+  name        = "application_sg"
+  description = "Allows all Inbound Traffic"
+  vpc_id      = "${aws_vpc.multitier_vpc.id}"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_1}"]
+  }
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_2}"]
+  }
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_1}"]
+  }
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_2}"]
+  }
+  tags = {
+    Name                = "APPLICATION_LOAD_BALANCER"
+    Ownercontact        = "navaneethreddydevops@gmail.com"
+    BusinessApplication = "APPLICATION_LOAD_BALANCER"
+  }
+  depends_on = [
+    "aws_vpc.multitier_vpc"
+  ]
+}
