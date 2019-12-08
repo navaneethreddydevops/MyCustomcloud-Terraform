@@ -237,17 +237,17 @@ resource "aws_alb_listener" "application_loadbalancer_listner" {
   load_balancer_arn = "${aws_alb.application_load_balancer.id}"
   port              = "80"
   protocol          = "HTTP"
-}
 
-default_action {
-  target_group_arn = "${aws_alb_target_group.alb_target_group.id}"
-  type             = "forward"
-}
+  default_action {
+    target_group_arn = "${aws_alb_target_group.alb_target_group.id}"
+    type             = "forward"
 
-depends_on = [
-  "aws_alb.application_load_balancer",
-  "aws_alb_target_group.alb_target_group"
-]
+    depends_on = [
+      "aws_alb.application_load_balancer",
+      "aws_alb_target_group.alb_target_group"
+    ]
+  }
+}
 
 ############Internet GateWay
 
@@ -377,3 +377,4 @@ resource "aws_route_table_association" "app_route_table_association2" {
   ]
 
 }
+

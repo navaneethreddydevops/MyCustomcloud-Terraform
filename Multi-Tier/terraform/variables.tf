@@ -31,6 +31,6 @@ variable "key_name" {
   default     = "keypair"
 }
 variable "az_count" {
-  description = "Ingress Subnet AZ 1 CIDR"
+  description = "number of Availablity zones"
   default     = "3"
 }
