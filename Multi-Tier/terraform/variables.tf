@@ -26,3 +26,7 @@ variable "MY_HOME_CIDR" {
   description = "Ingress Subnet AZ 1 CIDR"
   default     = "173.172.34.56/32"
 }
+variable "key_name" {
+  description = "Ingress Subnet AZ 1 CIDR"
+  default     = "keypair"
+}

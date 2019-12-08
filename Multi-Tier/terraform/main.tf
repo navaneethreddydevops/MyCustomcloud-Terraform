@@ -162,3 +162,38 @@ resource "aws_security_group" "application_sg" {
     "aws_vpc.multitier_vpc"
   ]
 }
+
+#########Launch Config For Bastion
+
+resource "aws_launch_configuration" "Bastion_Launch_Config" {
+  name_prefix     = "Bastion_Launch_Config-"
+  image_id        = "ami-01e24be29428c15b2"
+  instance_type   = "t2.micro"
+  key_name        = "${var.key_name}"
+  security_groups = ["${aws_security_group.bastion_sg.id}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+  depends_on = [
+    "aws_security_group.bastion_sg"
+  ]
+}
+#########Launch Config For Bastion
+
+resource "aws_autoscaling_group" "autoscaling_bastion" {
+  name                 = "autoscaling_bastion"
+  launch_configuration = "${aws_launch_configuration.Bastion_Launch_Config.name}"
+  min_size             = 1
+  max_size             = 1
+  vpc_zone_identifier  = ["${aws_subnet.PUBLIC_SUBNET_1.id}"]
+  lifecycle {
+    create_before_destroy = true
+  }
+  depends_on = [
+    "aws_launch_configuration.Bastion_Launch_Config",
+    "aws_subnet.PUBLIC_SUBNET_1",
+  ]
+
+}
+
