@@ -72,13 +72,13 @@ resource "aws_security_group" "bastion_sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_1}"]
+    cidr_blocks = ["${var.PRIVATE_SUBNET_CIDR_1}"]
   }
   egress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_2}"]
+    cidr_blocks = ["${var.PRIVATE_SUBNET_CIDR_2}"]
   }
   tags = {
     Name                = "BASTION_SG"
@@ -106,13 +106,13 @@ resource "aws_security_group" "application_loadbalancer_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_1}"]
+    cidr_blocks = ["${var.PRIVATE_SUBNET_CIDR_1}"]
   }
   egress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_2}"]
+    cidr_blocks = ["${var.PRIVATE_SUBNET_CIDR_2}"]
   }
   tags = {
     Name                = "APPLICATION_LOAD_BALANCER"
@@ -154,7 +154,7 @@ resource "aws_security_group" "application_sg" {
     cidr_blocks = ["${var.PUBLIC_SUBNET_CIDR_2}"]
   }
   tags = {
-    Name                = "APPLICATION_LOAD_BALANCER"
+    Name                = "APPLICATION_SG"
     Ownercontact        = "navaneethreddydevops@gmail.com"
     BusinessApplication = "APPLICATION_LOAD_BALANCER"
   }
