@@ -194,6 +194,71 @@ resource "aws_autoscaling_group" "autoscaling_bastion" {
     "aws_launch_configuration.Bastion_Launch_Config",
     "aws_subnet.PUBLIC_SUBNET_1",
   ]
+}
+
+############Target Group with PORT 80
+resource "aws_alb_target_group" "alb_target_group" {
+  name     = "alb_target_group"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = "${aws_vpc.multitier_vpc.id}"
+
+  depends_on = [
+    "aws_vpc.multitier_vpc"
+  ]
+}
+
+############Application Load Balancer
+resource "aws_alb" "application_load_balancer" {
+  name               = "application_load_balancer"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = ["${aws_security_group.application_loadbalancer_sg}"]
+  subnets            = ["${aws_subnet.PUBLIC_SUBNET_2.id}", "${aws_subnet.PUBLIC_SUBNET_1.id}"]
+
+  enable_deletion_protection = false
+
+  tags = {
+    Name                = "application_load_balancer"
+    Ownercontact        = "navaneethreddydevops@gmail.com"
+    BusinessApplication = "application_load_balancer"
+  }
+
+  depends_on = [
+    "aws_security_group.application_loadbalancer_sg",
+    "aws_subnet.PUBLIC_SUBNET_1",
+    "aws_subnet.PUBLIC_SUBNET_2"
+  ]
+}
+
+############# Application Loadbalancer Listener
+
+resource "aws_alb_listener" "application_loadbalancer_listner" {
+  load_balancer_arn = "${aws_alb.application_load_balancer.id}"
+  port              = "80"
+  protocol          = "HTTP"
+}
+
+default_action {
+  target_group_arn = "${aws_alb_target_group.alb_target_group.id}"
+  type             = "forward"
+}
+
+depends_on = [
+  "aws_alb.application_load_balancer",
+  "aws_alb_target_group.alb_target_group"
+]
+
+############Internet GateWay
+
+resource "aws_internet_gateway" "INTERNET-GATEWAY" {
+  vpc_id = "${aws_vpc.multitier_vpc.id}"
+
+  depends_on = [
+    "aws_vpc.multitier_vpc"
+  ]
 
 }
+
+######### Route Table and Its Association
 
