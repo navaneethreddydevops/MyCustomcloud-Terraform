@@ -302,7 +302,7 @@ resource "aws_eip" "NATIP2" {
 
 resource "aws_nat_gateway" "GW1" {
   allocation_id = "${aws_eip.NATIP1.id}"
-  subnet_id     = "#{aws_subnet.PUBLIC_SUBNET_CIDR_1.id}"
+  subnet_id     = "${aws_subnet.PUBLIC_SUBNET_CIDR_1.id}"
   tags = {
     Name                = "GW1"
     Ownercontact        = "navaneethreddydevops@gmail.com"
@@ -311,7 +311,7 @@ resource "aws_nat_gateway" "GW1" {
 }
 resource "aws_nat_gateway" "GW2" {
   allocation_id = "${aws_eip.NATIP2.id}"
-  subnet_id     = "#{aws_subnet.PUBLIC_SUBNET_CIDR_2.id}"
+  subnet_id     = "${aws_subnet.PUBLIC_SUBNET_CIDR_2.id}"
   tags = {
     Name                = "GW2"
     Ownercontact        = "navaneethreddydevops@gmail.com"
@@ -372,4 +372,69 @@ resource "aws_route_table_association" "app_route_table_association2" {
   ]
 
 }
+data "aws_ami" "nginx-ubuntu" {
+  most_recent = true
 
+  filter {
+    name   = "name"
+    values = ["nginx-plus-ami-ubuntu-hvm-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["679593333241"] # Canonical
+}
+resource "aws_launch_configuration" "app-launch-configuration" {
+  name_prefix     = "app-launch-configuration"
+  image_id        = "${data.aws_ami.nginx-ubuntu.id}"
+  instance_type   = "t2.micro"
+  key_name        = "${var.key_name}"
+  security_groups = ["${aws_security_group.application_sg.id}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [
+    "aws_security_group.application_sg"
+  ]
+}
+resource "aws_autoscaling_group" "app-autoscaling-group_az1" {
+  name                 = "app-autoscaling-group_az1"
+  launch_configuration = "${aws_launch_configuration.app-launch-configuration.name}"
+  min_size             = 1
+  max_size             = 2
+  vpc_zone_identifier  = ["${aws_subnet.PRIVATE_SUBNET_CIDR_1.id}"]
+  target_group_arns    = ["${aws_alb_target_group.alb-target-group.id}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [
+    "aws_launch_configuration.app-launch-configuration",
+    "aws_subnet.PRIVATE_SUBNET_CIDR_1",
+    "aws_alb_target_group.alb-target-group"
+  ]
+}
+resource "aws_autoscaling_group" "app-autoscaling-group_az2" {
+  name                 = "app-autoscaling-group_az2"
+  launch_configuration = "${aws_launch_configuration.app-launch-configuration.name}"
+  min_size             = 1
+  max_size             = 2
+  vpc_zone_identifier  = ["${aws_subnet.PRIVATE_SUBNET_CIDR_2.id}"]
+  target_group_arns    = ["${aws_alb_target_group.alb-target-group.id}"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [
+    "aws_launch_configuration.app-launch-configuration",
+    "aws_subnet.PRIVATE_SUBNET_CIDR_2",
+    "aws_alb_target_group.alb-target-group"
+  ]
+}
