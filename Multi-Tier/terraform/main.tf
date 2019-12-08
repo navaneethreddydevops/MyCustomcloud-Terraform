@@ -13,44 +13,44 @@ resource "aws_vpc" "multitier_vpc" {
     BusinessApplication = "MultiTier"
   }
 }
-resource "aws_subnet" "PUBLIC_SUBNET_1" {
+resource "aws_subnet" "PUBLIC_SUBNET_CIDR_1" {
   vpc_id                  = "${aws_vpc.multitier_vpc.id}"
   cidr_block              = "${var.PUBLIC_SUBNET_CIDR_1}"
   availability_zone       = "us-west-2a"
   map_public_ip_on_launch = "true"
   tags = {
-    Name                = "PUBLIC_SUBNET_1"
+    Name                = "PUBLIC_SUBNET_CIDR_1"
     Ownercontact        = "navaneethreddydevops@gmail.com"
     BusinessApplication = "PublicSubnet1"
   }
 }
-resource "aws_subnet" "PUBLIC_SUBNET_2" {
+resource "aws_subnet" "PUBLIC_SUBNET_CIDR_2" {
   vpc_id                  = "${aws_vpc.multitier_vpc.id}"
   cidr_block              = "${var.PUBLIC_SUBNET_CIDR_2}"
   availability_zone       = "us-west-2b"
   map_public_ip_on_launch = "true"
   tags = {
-    Name                = "PUBLIC_SUBNET_2"
+    Name                = "PUBLIC_SUBNET_CIDR_2"
     Ownercontact        = "navaneethreddydevops@gmail.com"
     BusinessApplication = "PublicSubnet2"
   }
 }
-resource "aws_subnet" "PRIVATE_SUBNET_1" {
+resource "aws_subnet" "PRIVATE_SUBNET_CIDR_1" {
   vpc_id            = "${aws_vpc.multitier_vpc.id}"
   cidr_block        = "${var.PRIVATE_SUBNET_CIDR_1}"
   availability_zone = "us-west-2a"
   tags = {
-    Name                = "PRIVATE_SUBNET_1"
+    Name                = "PRIVATE_SUBNET_CIDR_1"
     Ownercontact        = "navaneethreddydevops@gmail.com"
     BusinessApplication = "PrivateSubnet1"
   }
 }
-resource "aws_subnet" "PRIVATE_SUBNET_2" {
+resource "aws_subnet" "PRIVATE_SUBNET_CIDR_2" {
   vpc_id            = "${aws_vpc.multitier_vpc.id}"
   cidr_block        = "${var.PRIVATE_SUBNET_CIDR_2}"
   availability_zone = "us-west-2b"
   tags = {
-    Name                = "PRIVATE_SUBNET_2"
+    Name                = "PRIVATE_SUBNET_CIDR_2"
     Ownercontact        = "navaneethreddydevops@gmail.com"
     BusinessApplication = "PrivateSubnet2"
   }
@@ -186,19 +186,19 @@ resource "aws_autoscaling_group" "autoscaling_bastion" {
   launch_configuration = "${aws_launch_configuration.Bastion_Launch_Config.name}"
   min_size             = 1
   max_size             = 1
-  vpc_zone_identifier  = ["${aws_subnet.PUBLIC_SUBNET_1.id}"]
+  vpc_zone_identifier  = ["${aws_subnet.PUBLIC_SUBNET_CIDR_1.id}"]
   lifecycle {
     create_before_destroy = true
   }
   depends_on = [
     "aws_launch_configuration.Bastion_Launch_Config",
-    "aws_subnet.PUBLIC_SUBNET_1",
+    "aws_subnet.PUBLIC_SUBNET_CIDR_1",
   ]
 }
 
 ############Target Group with PORT 80
-resource "aws_alb_target_group" "alb_target_group" {
-  name     = "alb_target_group"
+resource "aws_alb_target_group" "alb-target-group" {
+  name     = "alb-target-group"
   port     = 80
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.multitier_vpc.id}"
@@ -209,43 +209,38 @@ resource "aws_alb_target_group" "alb_target_group" {
 }
 
 ############Application Load Balancer
-resource "aws_alb" "application_load_balancer" {
-  name               = "application_load_balancer"
+resource "aws_alb" "application-load-balancer" {
+  name               = "application-load-balancer"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = ["${aws_security_group.application_loadbalancer_sg}"]
-  subnets            = ["${aws_subnet.PUBLIC_SUBNET_2.id}", "${aws_subnet.PUBLIC_SUBNET_1.id}"]
+  security_groups    = ["${aws_security_group.application_loadbalancer_sg.id}"]
+  subnets            = ["${aws_subnet.PUBLIC_SUBNET_CIDR_1.id}", "${aws_subnet.PUBLIC_SUBNET_CIDR_2.id}"]
 
   enable_deletion_protection = false
 
   tags = {
-    Name                = "application_load_balancer"
+    Name                = "application-load-balancer"
     Ownercontact        = "navaneethreddydevops@gmail.com"
     BusinessApplication = "application_load_balancer"
   }
 
   depends_on = [
     "aws_security_group.application_loadbalancer_sg",
-    "aws_subnet.PUBLIC_SUBNET_1",
-    "aws_subnet.PUBLIC_SUBNET_2"
+    "aws_subnet.PUBLIC_SUBNET_CIDR_1",
+    "aws_subnet.PUBLIC_SUBNET_CIDR_2"
   ]
 }
 
 ############# Application Loadbalancer Listener
 
 resource "aws_alb_listener" "application_loadbalancer_listner" {
-  load_balancer_arn = "${aws_alb.application_load_balancer.id}"
+  load_balancer_arn = "${aws_alb.application-load-balancer.id}"
   port              = "80"
   protocol          = "HTTP"
 
   default_action {
-    target_group_arn = "${aws_alb_target_group.alb_target_group.id}"
+    target_group_arn = "${aws_alb_target_group.alb-target-group.id}"
     type             = "forward"
-
-    depends_on = [
-      "aws_alb.application_load_balancer",
-      "aws_alb_target_group.alb_target_group"
-    ]
   }
 }
 
@@ -267,7 +262,7 @@ resource "aws_route_table" "ROUTE_TABLE" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.INTERNET-GATEWAY}"
+    gateway_id = "${aws_internet_gateway.INTERNET-GATEWAY.id}"
   }
   depends_on = [
     "aws_vpc.multitier_vpc",
@@ -281,8 +276,8 @@ resource "aws_route_table_association" "routetable_association_1" {
   route_table_id = "${aws_route_table.ROUTE_TABLE.id}"
 
   depends_on = [
-    "aws_subnet.PRIVATE_SUBNET_1",
-    "aws_route.ROUTE_TABLE",
+    "aws_subnet.PUBLIC_SUBNET_CIDR_1",
+    "aws_route_table.ROUTE_TABLE",
   ]
 }
 
@@ -293,7 +288,7 @@ resource "aws_route_table_association" "routetable_association_2" {
 
   depends_on = [
     "aws_subnet.PUBLIC_SUBNET_CIDR_1",
-    "aws_route.ROUTE_TABLE",
+    "aws_route_table.ROUTE_TABLE",
   ]
 }
 resource "aws_eip" "NATIP1" {
@@ -347,7 +342,7 @@ resource "aws_route_table_association" "app_route_table_assocaition1" {
   route_table_id = "{aws_route_table.route_table1_app.id}"
 
   depends_on = [
-    "aws_subnet.PRIVATE_SUBNET_1",
+    "aws_subnet.PRIVATE_SUBNET_CIDR_1",
     "aws_route_table.route_table1_app",
   ]
 }
@@ -368,11 +363,11 @@ resource "aws_route_table" "route_table2_app" {
 
 resource "aws_route_table_association" "app_route_table_association2" {
   count          = "${var.az_count}"
-  subnet_id      = "${aws_subnet.PRIVATE_SUBNET_2.id}"
+  subnet_id      = "${aws_subnet.PRIVATE_SUBNET_CIDR_2.id}"
   route_table_id = "${aws_route_table.route_table2_app.id}"
 
   depends_on = [
-    "aws_subnet.PRIVATE_SUBNET_2",
+    "aws_subnet.PRIVATE_SUBNET_CIDR_2",
     "aws_route_table.route_table2_app",
   ]
 
