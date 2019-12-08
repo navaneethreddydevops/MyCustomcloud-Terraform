@@ -30,3 +30,7 @@ variable "key_name" {
   description = "Ingress Subnet AZ 1 CIDR"
   default     = "keypair"
 }
+variable "az_count" {
+  description = "Ingress Subnet AZ 1 CIDR"
+  default     = "3"
+}

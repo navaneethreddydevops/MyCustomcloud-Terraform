@@ -262,3 +262,118 @@ resource "aws_internet_gateway" "INTERNET-GATEWAY" {
 
 ######### Route Table and Its Association
 
+resource "aws_route_table" "ROUTE_TABLE" {
+  vpc_id = "${aws_vpc.multitier_vpc.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_internet_gateway.INTERNET-GATEWAY}"
+  }
+  depends_on = [
+    "aws_vpc.multitier_vpc",
+    "aws_internet_gateway.INTERNET-GATEWAY"
+  ]
+}
+
+resource "aws_route_table_association" "routetable_association_1" {
+  count          = "${var.az_count}"
+  subnet_id      = "${aws_subnet.PUBLIC_SUBNET_CIDR_1.id}"
+  route_table_id = "${aws_route_table.ROUTE_TABLE.id}"
+
+  depends_on = [
+    "aws_subnet.PRIVATE_SUBNET_1",
+    "aws_route.ROUTE_TABLE",
+  ]
+}
+
+resource "aws_route_table_association" "routetable_association_2" {
+  count          = "${var.az_count}"
+  subnet_id      = "${aws_subnet.PUBLIC_SUBNET_CIDR_2.id}"
+  route_table_id = "${aws_route_table.ROUTE_TABLE.id}"
+
+  depends_on = [
+    "aws_subnet.PUBLIC_SUBNET_CIDR_1",
+    "aws_route.ROUTE_TABLE",
+  ]
+}
+resource "aws_eip" "NATIP1" {
+  vpc                       = true
+  associate_with_private_ip = "${var.PUBLIC_SUBNET_CIDR_1_nat_ip}"
+}
+resource "aws_eip" "NATIP2" {
+  vpc                       = true
+  associate_with_private_ip = "${var.PUBLIC_SUBNET_CIDR_2_nat_ip}"
+}
+
+resource "aws_nat_gateway" "GW1" {
+  allocation_id = "${aws_eip.NATIP1.id}"
+  subnet_id     = "#{aws_subnet.PUBLIC_SUBNET_CIDR_1.id}"
+  tags = {
+    Name                = "GW1"
+    Ownercontact        = "navaneethreddydevops@gmail.com"
+    BusinessApplication = "GW1"
+  }
+}
+resource "aws_nat_gateway" "GW2" {
+  allocation_id = "${aws_eip.NATIP2.id}"
+  subnet_id     = "#{aws_subnet.PUBLIC_SUBNET_CIDR_2.id}"
+  tags = {
+    Name                = "GW2"
+    Ownercontact        = "navaneethreddydevops@gmail.com"
+    BusinessApplication = "GW2"
+  }
+}
+
+######### Route Table and Associations for Web Servers
+
+resource "aws_route_table" "route_table1_app" {
+  vpc_id = "${aws_vpc.multitier_vpc.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_nat_gateway.GW1.id}"
+  }
+
+  depends_on = [
+    "aws_vpc.multitier_vpc",
+    "aws_nat_gateway.GW1"
+  ]
+
+}
+
+resource "aws_route_table_association" "app_route_table_assocaition1" {
+  count          = "${var.az_count}"
+  subnet_id      = "{aws_subnet.PRIVATE_SUBNET_CIDR_1.id}"
+  route_table_id = "{aws_route_table.route_table1_app.id}"
+
+  depends_on = [
+    "aws_subnet.PRIVATE_SUBNET_1",
+    "aws_route_table.route_table1_app",
+  ]
+}
+resource "aws_route_table" "route_table2_app" {
+  vpc_id = "${aws_vpc.multitier_vpc.id}"
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = "${aws_nat_gateway.GW2.id}"
+  }
+
+  depends_on = [
+    "aws_vpc.multitier_vpc",
+    "aws_nat_gateway.GW2"
+  ]
+
+}
+
+resource "aws_route_table_association" "app_route_table_association2" {
+  count          = "${var.az_count}"
+  subnet_id      = "${aws_subnet.PRIVATE_SUBNET_2.id}"
+  route_table_id = "${aws_route_table.route_table2_app.id}"
+
+  depends_on = [
+    "aws_subnet.PRIVATE_SUBNET_2",
+    "aws_route_table.route_table2_app",
+  ]
+
+}
