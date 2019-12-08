@@ -34,3 +34,11 @@ variable "az_count" {
   description = "number of Availablity zones"
   default     = "3"
 }
+variable "PUBLIC_SUBNET_CIDR_1_private_ip" {
+  description = "Ingress Subnet AZ 1 CIDR"
+  default     = "10.102.1.1"
+}
+variable "PUBLIC_SUBNET_CIDR_2_private_ip" {
+  description = "Ingress Subnet AZ 1 CIDR"
+  default     = "10.102.2.1"
+}

@@ -298,11 +298,11 @@ resource "aws_route_table_association" "routetable_association_2" {
 }
 resource "aws_eip" "NATIP1" {
   vpc                       = true
-  associate_with_private_ip = "${var.PUBLIC_SUBNET_CIDR_1_nat_ip}"
+  associate_with_private_ip = "${var.PUBLIC_SUBNET_CIDR_1_private_ip}"
 }
 resource "aws_eip" "NATIP2" {
   vpc                       = true
-  associate_with_private_ip = "${var.PUBLIC_SUBNET_CIDR_2_nat_ip}"
+  associate_with_private_ip = "${var.PUBLIC_SUBNET_CIDR_2_private_ip}"
 }
 
 resource "aws_nat_gateway" "GW1" {
