@@ -27,7 +27,7 @@ pipeline {
                 sh '''
                 cd $WORKSPACE/Multi-Tier/terraform
                 ls -lrt
-                /usr/local/bin/terraform plan
+                /usr/local/bin/terraform plan -out myplan
                 '''
             }
         }
@@ -37,15 +37,16 @@ pipeline {
                 sh '''
                 cd $WORKSPACE/Multi-Tier/terraform
                 ls -lrt
-                /usr/local/bin/terraform apply
+                /usr/local/bin/terraform -input=false myplan
                 '''
             }
         }
-            stage('Example') {
-            input {
-                message "Should we continue?"
-                yes "Yes, we should."
+            stage('Approval') {
+            steps {
+            script {
+            def userInput = input(id: 'confirm', message: 'Apply Terraform?', parameters: [ [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Apply terraform', name: 'confirm'] ])
+                  }
+                }
             }
-        }
     }
 }
