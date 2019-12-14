@@ -15,6 +15,7 @@ pipeline {
             steps {
                 echo 'Planning the West VPC'
                 sh '''
+                pwd
                 /usr/local/bin/terraform plan
                 '''
             }
