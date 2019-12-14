@@ -17,6 +17,7 @@ pipeline {
                 sh '''
                 cd $WORKSPACE
                 pwd
+                ls -lrt
                 /usr/local/bin/terraform plan
                 '''
             }
