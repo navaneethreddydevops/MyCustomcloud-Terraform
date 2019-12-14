@@ -15,8 +15,7 @@ pipeline {
             steps {
                 echo 'Planning the West VPC'
                 sh '''
-                cd $WORKSPACE
-                pwd
+                cd $WORKSPACE/Multi-Tier/terraform
                 ls -lrt
                 /usr/local/bin/terraform plan
                 '''
