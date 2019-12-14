@@ -31,7 +31,7 @@ pipeline {
                 '''
             }
         }
-            stage('Infrastructure Plan') {
+            stage('Infrastructure Provisioning') {
             steps {
                 echo 'Creating the West VPC'
                 sh '''
