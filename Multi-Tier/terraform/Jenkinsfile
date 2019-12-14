@@ -55,7 +55,7 @@ pipeline {
                   }
                 }
             }
-        stage('Infrastructure Provisioning') {
+        stage('Infrastructure Destruction') {
             steps {
                 echo 'Creating the West VPC'
                 sh '''
