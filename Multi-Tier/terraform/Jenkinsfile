@@ -38,15 +38,15 @@ pipeline {
                   }
                 }
             }
-            stage('Infrastructure Provisioning') {
+        stage('Infrastructure Provisioning') {
             steps {
                 echo 'Creating the West VPC'
                 sh '''
                 cd $WORKSPACE/Multi-Tier/terraform
                 ls -lrt
-                /usr/local/bin/terraform -input=false myplan
+                /usr/local/bin/terraform apply -input=false myplan
                 '''
             }
         }
-        }
+    }
 }
