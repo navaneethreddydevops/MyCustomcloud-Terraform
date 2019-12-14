@@ -11,10 +11,19 @@ pipeline {
                 '''
             }
         }
-        stage('Infrastructure Provisioning') {
+        stage('Infrastructure Plan') {
             steps {
-                echo 'EMR Creation'
-                sh 'echo "This is a sample job for testing"'
+                echo 'Planning the West VPC'
+                sh '''
+                /usr/local/bin/terraform plan
+                '''
+            }
+            stage('Infrastructure Provisionig') {
+            steps {
+                echo 'Creating the West VPC'
+                sh '''
+                /usr/local/bin/terraform apply
+                '''
             }
         }
     }
