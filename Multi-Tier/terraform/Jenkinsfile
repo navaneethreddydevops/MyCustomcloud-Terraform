@@ -1,0 +1,21 @@
+pipeline {
+    agent any 
+    stages {
+        stage('Checking Applications Versions') {
+            steps {
+                sh '''
+                echo 'Applications Version'
+                /usr/local/bin/aws --version
+                /usr/local/bin/terraform --version
+                /usr/local/bin/docker --version
+                '''
+            }
+        }
+        stage('Infrastructure Provisioning') {
+            steps {
+                echo 'EMR Creation'
+                sh 'echo "This is a sample job for testing"'
+            }
+        }
+    }
+}
