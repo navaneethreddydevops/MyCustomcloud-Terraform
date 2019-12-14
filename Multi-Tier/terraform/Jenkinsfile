@@ -11,20 +11,31 @@ pipeline {
                 '''
             }
         }
-        stage('Infrastructure Plan') {
+        stage('Terraform Init') {
             steps {
                 echo 'Planning the West VPC'
+                sh '''
+                cd $WORKSPACE/Multi-Tier/terraform
+                ls -lrt
+                /usr/local/bin/terraform init
+                '''
+            }
+        }
+        stage('Infrastructure Plan') {
+            steps {
+                echo 'Creating the West VPC'
                 sh '''
                 cd $WORKSPACE/Multi-Tier/terraform
                 ls -lrt
                 /usr/local/bin/terraform plan
                 '''
             }
-        }
-        stage('Infrastructure Provisionig') {
+            stage('Infrastructure Plan') {
             steps {
                 echo 'Creating the West VPC'
                 sh '''
+                cd $WORKSPACE/Multi-Tier/terraform
+                ls -lrt
                 /usr/local/bin/terraform apply
                 '''
             }
