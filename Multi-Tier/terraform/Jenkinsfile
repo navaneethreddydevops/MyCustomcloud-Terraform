@@ -30,6 +30,7 @@ pipeline {
                 /usr/local/bin/terraform plan
                 '''
             }
+        }
             stage('Infrastructure Plan') {
             steps {
                 echo 'Creating the West VPC'
