@@ -34,10 +34,11 @@ resource "aws_dynamodb_table" "terraform_locks" {
   }
 }
 
+#####Variables are not allowed in backend configuration
 terraform{
   backend "s3" {
     bucket ="terraform-statefiles-bucket"
-    key ="/"
+    key ="Statefiles/"
     region ="us-east-1"
 
     dynamodb_table="terraform-statefiles-locks"
