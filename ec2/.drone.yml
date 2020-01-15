@@ -1,4 +1,0 @@
-pipeline:
-  terraform:
-  image: jmccann/drone-terraform:1
-  plan: false
