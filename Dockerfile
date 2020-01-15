@@ -45,6 +45,6 @@ RUN pip install awscli --upgrade --user
 ENV PATH=~/.local/bin:$PATH
 
 # Adds local templates directory and contents in /usr/local/terrafrom-templates
-COPY terraform /usr/local/bin/terrafrom-templates
+#COPY terraform /usr/local/bin/terrafrom-templates
 
 RUN mkdir ~/.aws && touch ~/.aws/credentials
