@@ -1,6 +1,6 @@
 provider "aws" {
   region                  = "${var.aws_region}"
-  shared_credentials_file = "/Users/navaneethreddy/.aws/credentials"
+  shared_credentials_file = ""
   profile                 = "default"
 }
 resource "aws_vpc" "redshift_vpc" {
