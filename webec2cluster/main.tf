@@ -4,7 +4,7 @@ provider "aws" {
   profile                 = var.profile
 }
 resource "aws_launch_configuration" "launchtemplate" {
-  image_id        = var.image[var.region]
+  image_id= var.image[var.region]
   instance_type   = var.instance_type
   key_name        = var.key_name
   security_groups = [aws_security_group.securitygroup.id]
