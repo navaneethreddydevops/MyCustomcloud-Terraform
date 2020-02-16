@@ -4,12 +4,12 @@ pipeline {
     stage('Checkout') {
       steps {
         checkout scm
-        sh 'cd webec2cluster'
       }
     }
     stage('TF Plan') {
        steps {
            sh '''
+           cd webec2cluster
            /usr/local/bin/terraform init
            /usr/local/bin/terraform plan -out myplan
            '''
