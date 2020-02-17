@@ -4,7 +4,7 @@ variable "region" {
 }
 variable "profile" {
   type    = "string"
-  default = "pythonAutomation"
+  default = "default"
 }
 variable "shared_credentials_file" {
   type    = "string"
